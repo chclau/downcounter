@@ -1,10 +1,17 @@
-------------------------------------------------------------------
--- Name	       : tb_downcounter.vhd
--- Description : Testbench for downcounter.vhd
--- Designed by : Claudio Avi Chami - FPGA Site
--- Date        : 26/03/2016
--- Version     : 01
-------------------------------------------------------------------
+----------------------------------------------------------------------------------
+-- Company:  FPGA'er
+-- Engineer: Claudio Avi Chami - FPGA'er Website
+--           http://fpgaer.tech
+-- Create Date: 23.08.2022 
+-- Module Name: tb_downcounter.vhd
+-- Description: testbench for down counter
+--              
+-- Dependencies: downcounter.vhd
+-- 
+-- Revision: 1
+-- Revision  1 - File Created
+-- 
+----------------------------------------------------------------------------------------------------------------------------------------------------
 library ieee;
     use ieee.std_logic_1164.all;
 	use ieee.numeric_std.ALL;
