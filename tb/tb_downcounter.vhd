@@ -2,7 +2,7 @@
 -- Company:  FPGA'er
 -- Engineer: Claudio Avi Chami - FPGA'er Website
 --           http://fpgaer.tech
--- Create Date: 23.08.2022 
+-- Create Date: 25.09.2022 
 -- Module Name: tb_downcounter.vhd
 -- Description: testbench for down counter
 --              
@@ -10,6 +10,7 @@
 -- 
 -- Revision: 1
 -- Revision  1 - File Created
+--           2 - New version, unconstrained signal
 -- 
 ----------------------------------------------------------------------------------------------------------------------------------------------------
 library ieee;
@@ -21,30 +22,34 @@ end entity;
 
 architecture test of tb_downcounter is
 
-    constant DATA_W  : natural := 32;
+    constant DATA_W1 : natural := 32;
+    constant DATA_W2 : natural := 8;
     constant PERIOD  : time := 10 ns;
 	
     signal clk       : std_logic := '0';
     signal rstn      : std_logic := '0';
     signal load      : std_logic := '0';
     signal en        : std_logic := '0';
-    signal data_in   : std_logic_vector (DATA_W-1 downto 0) := (others => '0');
-    signal endSim	   : boolean   := false;
+    signal done1      : std_logic;
+    signal done2      : std_logic;
+    signal data_in1  : std_logic_vector (DATA_W1-1 downto 0) := (others => '0');
+    signal data_out1 : std_logic_vector (DATA_W1-1 downto 0) := (others => '0');
+    signal data_in2  : std_logic_vector (DATA_W1-1 downto 0) := (others => '0');
+    signal data_out2 : std_logic_vector (DATA_W1-1 downto 0) := (others => '0');
+    signal endSim	 : boolean   := false;
 
-    component downcounter  is
-      generic ( DATA_W		: natural := 32 );
-      
+    component downcounter  is      
       port (
         clk: 		  in std_logic;
         rstn: 		in std_logic;
         
         -- inputs
-        data_in:	in std_logic_vector (DATA_W-1 downto 0);
+        data_in:	in std_logic_vector;
         load: 		in std_logic;
         en:			  in std_logic;
         
         -- outputs
-        data_out: out std_logic_vector (DATA_W-1 downto 0);
+        data_out: out std_logic_vector;
         done:		  out std_logic
       );
     end component;
@@ -62,8 +67,9 @@ begin
     wait until(rising_edge(clk));
     wait until(rising_edge(clk));
     
-    data_in <= std_logic_vector(to_unsigned(4, data_in'length));
-    load    <= '1';
+    data_in1 <= std_logic_vector(to_unsigned(4, data_in1'length));
+    data_in2 <= std_logic_vector(to_unsigned(7, data_in2'length));
+    load     <= '1';
     wait until(rising_edge(clk));
     load    <= '0';
     en      <= '1';
@@ -79,13 +85,14 @@ begin
    
 		wait for 70 ns;
     
-    data_in <= std_logic_vector(to_unsigned(15, data_in'length));
+    data_in1 <= std_logic_vector(to_unsigned(15, data_in1'length));
+    data_in2 <= std_logic_vector(to_unsigned(22, data_in1'length));
     load    <= '1';
     wait until(rising_edge(clk));
     load    <= '0';
 
 		wait for 30 ns;
-    data_in <= std_logic_vector(to_unsigned(5, data_in'length));
+    data_in1 <= std_logic_vector(to_unsigned(5, data_in1'length));
     load    <= '1';
     wait until(rising_edge(clk));
     load    <= '0';
@@ -105,18 +112,26 @@ begin
 		wait for 10 ns;
 	end process;	
 
-    downc_inst : downcounter
-      generic map (
-        DATA_W	 => DATA_W
-      )
+    downc_inst1 : downcounter
       port map (
         clk 		  => clk 		  ,
         rstn		  => rstn		  ,
-        data_in 	=> data_in  ,
+        data_in 	=> data_in1  ,
         load 		  => load 		,
         en			  => en			  ,
-        data_out  => open     ,
-        done		  => open
+        data_out  => data_out1 ,
+        done		  => done1
       );
+   
+    downc_inst2 : downcounter
+         port map (
+           clk           => clk           ,
+           rstn          => rstn          ,
+           data_in     => data_in2  ,
+           load           => load         ,
+           en              => en              ,
+           data_out  => data_out2 ,
+           done          => done2
+         );
 
 end architecture;
