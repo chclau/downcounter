@@ -8,9 +8,10 @@
 --              
 -- Dependencies: None
 -- 
--- Revision: 2
+-- Revision: 3
 -- Revision  1 - File Created
 --           2 - Using unconstrained unsigned ports 
+--           3 - Normalize unconstrained input using alias 
 ----------------------------------------------------------------------------------------------------------------------------------------------------
 
 library ieee;
@@ -34,7 +35,8 @@ entity downcounter is
   );
 end downcounter;
 architecture rtl of downcounter is
-
+  -- normalize the unconstrained input
+  alias data_in_norm : std_logic_vector(data_in'length - 1 downto 0) is data_in; -- normalized unconstrained input
 begin
 
   counter_pr : process (clk)
@@ -44,7 +46,7 @@ begin
         data_out <= (others => '0');
         done <= '0';
       elsif (load = '1') then           -- load counter
-        data_out <= unsigned(data_in);
+        data_out <= unsigned(data_in_norm);
         done <= '0';                    -- start a new countdown - deassert done signal
       elsif (en = '1') then             -- is counting enabled?
         if (data_out = 0) then          -- check if counter reached zero
